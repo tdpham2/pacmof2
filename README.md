@@ -11,6 +11,11 @@ PACMOF2 has been tested with Python 3.9 and requires the following dependencies:
 - Scikit-Learn (1.3.2)
 
 ### Using Anaconda
+First, clone the repository:
+```bash
+git clone https://github.com/tdpham2/pacmof2
+```
+
 We recommend installing dependencies using an Anaconda environment:
 
 ```bash
