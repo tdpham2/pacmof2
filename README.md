@@ -46,7 +46,24 @@ pip install .
 ```
 
 ## Usage
-To be updated soon.
+PACMOF2 can be used to predict partial atomic charges in neutral MOFs (MOFs with a neutral unit cell) or ionic MOFs (MOFs with charged unit cells). Examples to run PACMOF2 are included in example/ folder. In general, to predict the charges of a neutral MOFs, run the following command:
+
+from pacmof2 import pacmof2
+path_to_cif = 'path/to/cif'
+output_path = 'pacmof'
+pacmof2.get_charges(path_to_cif, output_path, identifier="_pacmof")
+
+PACMOF2 can also be used to predict the partial charges for a folder of CIFs. Here is an example:
+from pacmof2 import pacmof2
+path_to_cif = 'path/to/cifs'
+output_path = 'pacmof'
+pacmof2.get_charges(path_to_cifs, output_path, identifier='_pacmof', multiple_cifs=True)
+
+For ionic MOFs, we need to specify the net charge(s) of the framework(s). For a single CIF, you can predict the charges using the following command:
+from pacmof2 import pacmof2
+path_to_cif = 'path/to/cif'
+output_path = 'pacmof'
+
 
 ## Reference
 To be updated soon.
