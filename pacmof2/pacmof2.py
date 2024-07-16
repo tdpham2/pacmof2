@@ -628,7 +628,6 @@ def get_charges(path_to_cif, output_path, identifier='_pacmof', multiple_cifs=Fa
             print("Cannot featurize {}".format(path_to_cif))
         else:
             features = atoms.info['features']
-            print('Loading model...')
             model = joblib.load(model_file)
             charges = model.predict(features)
 

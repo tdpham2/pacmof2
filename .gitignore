@@ -1,3 +1,4 @@
 build/
 pacmof2.egg-info/
 *.gz
+dist/
