@@ -317,24 +317,6 @@ def get_features_cif(path_to_cif):
     return features
 
 def write_cif(fileobj, images, charges, format='default'):
-    """ Description
-    This is a clone of the ASE's write_cif funtion from the ase.io.cif module. It is modified so as to write the '_atom_site_charge' also
-    while writing the CIF file.
-
-    :type fileobj: string/file handle
-    :param fileobj:path string or file handle to the output CIF
-
-    :type images: ASE atoms object
-    :param images: the atoms object you want to write to CIF format.
-
-    :type format: string
-    :param format: Some option found within the original function. Refer to ASE's documentation for more info.
-
-    :raises:
-
-    :rtype: None. Just writs the file.
-    """
-
     def write_enc(fileobj, s):
         """Write string in latin-1 encoding."""
         fileobj.write(s.encode("latin-1"))
@@ -514,13 +496,12 @@ def get_charges(path_to_cif, output_path, identifier='_pacmof', multiple_cifs=Fa
         path_to_cif (str): Path to a CIF file/directory. If multiple_cifs == True, use glob to get all the CIF file in path_to_cif.
         output_path (str): Path to write output
         identifier (str): Identifier to name the new file
-        model_name (str): Name of the model used
         multiple_cifs (bool): Specify whether multiple CIFs are in path_to_cif. If yes, only load the model once to save time.
-        net_charge: float or dictionary. If multiple_cifs == False, then specify the net charge as float. If multiple_cifs == True, then specify a dictionary of net_charge correspending for each CIF. e.g                    {'NU-1000.cif': -10}. If multiple_cifs == True, and don't specify the net_charge, only the neutral model is used.
-
+        adjust_charge_method (str): Specify the method to adjust charge. Two options: 'mean' and 'magnitude'.
+        net_charge (float or dictionary). If net_charge == 0, only PACMOF2_neutral model is used. Else, if multiple_cifs == False, then specify the net charge as float. If multiple_cifs == True, then specify a dictionary of net_charge correspending for each CIF, i.e. {'MOF1': -8, 'MOF2': -2}. 
     """ 
-    model_name = 'RF_neutral.sav'
-    ionic_model = 'RF_ionic.sav'
+    model_name = 'PACMOF2_neutral.gz'
+    ionic_model = 'PACMOF2_ionic.gz'
     # Adjust charge from model prediction to achieve charge neutrality.
     def adjust_charge(charges, by='mean', net_charge=0):
         if by == 'magnitude':
@@ -539,9 +520,9 @@ def get_charges(path_to_cif, output_path, identifier='_pacmof', multiple_cifs=Fa
     if multiple_cifs == True:
         import glob
         cifs = sorted(glob.glob(os.path.join(path_to_cif, '*.cif' )))
+        print("Loading Models {} ...".format(model_name))
 
         # Load neutral model
-        print("Loading PACMOF2-neutral model")
         model = joblib.load(model_file)
 
         if net_charge == 0:
@@ -572,7 +553,6 @@ def get_charges(path_to_cif, output_path, identifier='_pacmof', multiple_cifs=Fa
                                 f.write(','.join(at) + '\n')
         else:
             # Load ionic model
-            print("Loading PACMOF2-ionic model")
             ionic_model = joblib.load(ionic_file)
             for cif in tqdm(cifs, desc="Number of CIFs"):
                 cif_path = os.path.abspath(cif)
@@ -648,15 +628,44 @@ def get_charges(path_to_cif, output_path, identifier='_pacmof', multiple_cifs=Fa
             print("Cannot featurize {}".format(path_to_cif))
         else:
             features = atoms.info['features']
-            print('Loading PACMOF2-ionic model')
-            model = joblib.load(ionic_file)
+            print('Loading model...')
+            model = joblib.load(model_file)
+            charges = model.predict(features)
+
+            if print_features == True:
+                with open('features_neutral.csv', 'a') as f:
+                    for at in features:
+                        at = [str(i) for i in at]
+                        f.write(','.join(at) + '\n')
+
+            if net_charge == 0:
+                charges = adjust_charge(charges, by=adjust_charge_method)
+                #print("Sum of Charges: {}".format(sum(charges)))
+                cif_path = os.path.abspath(path_to_cif)
+                cif_path = os.path.basename(cif_path)
+                old_name = cif_path.split('/')[-1][:-4]
+                new_name  = old_name + identifier + '.cif'
+                path_to_output_cif = os.path.join(os.path.abspath(output_path), new_name)
+                print("Writing CIF {}".format(new_name))
+                write_cif(path_to_output_cif, atoms, charges)
+            else:
+                natoms = len(atoms)
+                net_charge_per_atoms = net_charge / natoms
+                for idx, at_f in enumerate(features):
+                    # Add PACMOF charge to features for ionic model
+                    at_f.append(round(charges[idx], 4))
+                    # Add net charge per unit cell for ionic model
+                    at_f.append(round(net_charge_per_atoms, 4))
+
+                ionic_file = (impresources.files(models) / ionic_model)
+                ionic_model = joblib.load(ionic_file)
                 charge_diff = ionic_model.predict(features)
                 ionic_charges = charge_diff + charges
 
-                #print('Net charge before correction: {}'.format(np.sum(ionic_charges)))
+                print('Net charge before correction: {}'.format(np.sum(ionic_charges)))
                 ionic_charges = adjust_charge(ionic_charges, by=adjust_charge_method, net_charge=net_charge)
 
-                #print('Net charge after correction: {}'.format(np.sum(ionic_charges)))
+                print('Net charge after correction: {}'.format(np.sum(ionic_charges)))
 
                 cif_path = os.path.abspath(path_to_cif)
                 cif_path = os.path.basename(cif_path)
@@ -672,5 +681,3 @@ def get_charges(path_to_cif, output_path, identifier='_pacmof', multiple_cifs=Fa
                         for at in features:
                             at = [str(i) for i in at]
                             f.write(','.join(at) + '\n')
-
-

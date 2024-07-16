@@ -1,4 +1,3 @@
 build/
 pacmof2.egg-info/
-RF_ionic.sav
-
+*.gz
