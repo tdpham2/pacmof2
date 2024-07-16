@@ -2,6 +2,7 @@
 
 ## Overview
 PACMOF2 is a Python package designed to predict partial atomic charges in Metal-Organic Frameworks (MOFs) with Density Functional Theory (DFT) level accuracy. It includes two pre-trained machine learning models: `PACMOF2_neutral` for neutral MOFs and `PACMOF2_ionic` for ionic MOFs. Detailed methods and implementation can be found in our upcoming publication.
+Associated data (models, DDEC6 data, PACMOF2 prediction data) for the project is available on Zenodo: https://zenodo.org/records/12747095
 
 ## Installation
 PACMOF2 has been tested with Python 3.9 and requires the following dependencies:
@@ -10,13 +11,12 @@ PACMOF2 has been tested with Python 3.9 and requires the following dependencies:
 - Atomic Simulation Environment (ASE) (3.22.1)
 - Scikit-Learn (1.3.2)
 
-### Using Anaconda
 First, clone the repository:
 ```bash
 git clone https://github.com/tdpham2/pacmof2
 ```
 
-We recommend installing dependencies using an Anaconda environment:
+### Using Anaconda
 
 ```bash
 conda create -n pacmof2 python==3.9
