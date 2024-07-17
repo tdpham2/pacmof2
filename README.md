@@ -1,11 +1,11 @@
-# PACMOF2: Predicting Partial Atomic Charges in Metal-Organic Frameworks
+# PACMOF2: Predicting Partial Atomic Charges in Metal-Organic Frameworks: An Extension to Ionic MOFs
 
 ## Overview
 PACMOF2 is a Python package designed to predict partial atomic charges in Metal-Organic Frameworks (MOFs) with Density Functional Theory (DFT) level accuracy. It includes two pre-trained machine learning models: `PACMOF2_neutral` for neutral MOFs and `PACMOF2_ionic` for ionic MOFs. Detailed methods and implementation can be found in our upcoming publication.
 Associated data (models, DDEC6 data, PACMOF2 prediction data) for the project is available on Zenodo: https://zenodo.org/records/12747095
 
 ## Installation
-PACMOF2 has been tested with Python 3.9 and requires the following dependencies:
+PACMOF2 has been tested with Python 3.9 and requires the following dependencies. Newer versions of these dependencies may work as well, but we did not test them.
 
 - Pymatgen (2023.10.4)
 - Atomic Simulation Environment (ASE) (3.22.1)
@@ -21,7 +21,7 @@ git clone https://github.com/tdpham2/pacmof2
 ```bash
 conda create -n pacmof2 python==3.9
 conda activate pacmof2
-conda install -c conda-forge pymatgen
+conda install -c conda-forge pymatgen=2023.10.4
 conda install -c conda-forge ase=3.22.1
 conda install -c conda-forge scikit-learn=1.3.2
 pip install build
@@ -56,7 +56,7 @@ pip install .
 ```
 
 ## Usage
-PACMOF2 can predict partial atomic charges for both neutral and ionic MOFs.
+PACMOF2 can predict partial atomic charges for both neutral and ionic MOFs. Example scripts and CIF files for using PACMOF2 are shown in examples/.
 
 ### Predicting Charges for Neutral MOFs
 To predict charges for a single neutral MOF:
