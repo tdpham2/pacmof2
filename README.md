@@ -105,4 +105,4 @@ pacmof2.get_charges(path_to_cif, output_path, identifier='_pacmof', multiple_cif
 ```
 
 ## Reference
-Details on the method and implementation will be updated soon.
+Our work is available on JPCC: https://pubs.acs.org/doi/10.1021/acs.jpcc.4c04879#
